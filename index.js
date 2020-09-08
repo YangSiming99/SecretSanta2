@@ -1,16 +1,12 @@
 const express = require('express');
 const path = require('path');
-const generatePassword = require('password-generator');
 
 const app = express();
 
 app.use(express.static(path.join(__dirname, 'client/build')));
 
-app.get('/api/passwords', (req, res) => {
-  const count = 5;
-  const password = Array.from(Array(count).keys()).map(i => generatePassword(12, false))
-  res.json(password);
-  console.log(`sent ${count} passwords`)
+app.get('/api/example', (req, res) => {
+  res.json({message: "this was sent from the server"});
 });
 
 app.get('*', (req, res) => {
