@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import io from 'socket.io-client';
 import './App.css';
 
-const App = () => {
-  const [message, setMessage] = useState("no message :(");
-  useEffect(()=> {
-    fetch('/api/example')
-      .then(res => res.json())
-      .then(resp => setMessage(resp.message))
-  }, [])
+import SocketTest from './socketTest/socketTest';
+import Rooms from './rooms/rooms';
 
+import  { SocketProvider } from './socketContext';
+
+const socket = io('http://localhost:8000', {
+  withCredentials: true
+})
+
+const App = () => {
   return(
-    <div>
-      <h1>{message}</h1>
-    </div>
+    <SocketProvider value={socket}>
+      <Rooms />
+    </SocketProvider>
   )
 }
 
