@@ -7,9 +7,7 @@ import Rooms from './rooms/rooms';
 
 import  { SocketProvider } from './socketContext';
 
-const socket = io('http://localhost:8000', {
-  withCredentials: true
-})
+const socket = io()
 
 const App = () => {
   return(

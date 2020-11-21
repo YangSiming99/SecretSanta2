@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const cors = require('cors');
 
 const app = express();
 
@@ -7,29 +8,17 @@ const server = require('http').createServer(app);
 
 const io = require('socket.io')(server, {
   cors:{
-    origin: 'http://localhost:3000',
-    credentials: true
+    origin: true,
+    credentials: true,
+    methods: ["GET", "POST"],
+    allowedHeaders: ["my-custom-header"]
   }
 })
 
 let roomList = [
-  {
-    name: 'room1',
-    people: [
-      'person1',
-      'person2',
-      'person3',
-    ]
-  },
-  {
-    name: 'room2',
-    people: [
-      'person4',
-      'person5',
-      'person6',
-    ]
-  }
 ];
+
+app.use(cors());
 
 app.use(express.static(path.join(__dirname, 'client/build')));
 
@@ -72,6 +61,6 @@ io.on('connection', socket => {
 const port = process.env.PORT || 5000;
 const socketPort = 8000;
 io.listen(socketPort);
-app.listen(port);
+server.listen(port);
 
 console.log(`listening on port ${port}`);
