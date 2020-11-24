@@ -1,47 +1,83 @@
 import React, { useReducer, useState, useEffect, useContext } from 'react';
-import { Socket } from 'socket.io';
 import SocketContext from '../../socketContext';
-
-const initialState = {
-  roomName : "",
-  hostName : ""
-}
+import RoomContext from '../../roomContext';
 
 const reducer = (state, action) => {
   switch(action.field){
     case "roomName" : return {...state, roomName: action.value};
-    case "hostName" : return {...state, hostName: action.value};
+    case "Name" : return {...state, Name: action.value};
+    case "giftAmount" : return {...state, giftAmount: action.value};
   }
 }
 
-const CreateRoom = ({setCreateWindow}) => {
+const CreateRoom = ({roomName, setCreateWindow}) => {
+
+  const initialState = {
+    roomName : roomName === undefined ? "" : roomName,
+    Name : "",
+    giftAmount: "1"
+  }
+
   const [info, dispatchInfo] = useReducer(reducer, initialState);
   const socket = useContext(SocketContext);
+  const {joinedRoom, setJoinedRoom, setHost} = useContext(RoomContext);
 
   const confirm = () => {
-    socket.emit('create room', {...info})
-    setCreateWindow(false);
+    if(roomName === undefined){
+      socket.emit('create room', {...info})
+      setJoinedRoom(info.roomName);
+      setHost(true);
+      setCreateWindow(false);
+    }
+    else {
+      socket.emit('join room', {...info})
+      setJoinedRoom(info.roomName)
+      setCreateWindow(false)
+    }
   }
 
   return ( 
     <div>
-      <h1>Create Room</h1>
-      <label htmlFor={"roomName"}>Room Name: </label>
+      {roomName === undefined
+        ? <h1>Create Room</h1>
+        : <h1>Join Room</h1>
+      }
+      {roomName === undefined
+        ? (      
+        <div>
+          <label htmlFor={"roomName"}>Room Name: </label>
+          <br />
+          <input 
+            type="text" 
+            id={"roomName"}
+            onChange={e => dispatchInfo({value: e.target.value, field: 'roomName'})}
+          />
+        <br />
+        </div>
+        )
+        : <></>
+      }
+      <div>
+      <label htmlFor={"Name"}>Name: </label>
       <br />
       <input 
         type="text" 
-        id={"roomName"}
-        onChange={e => dispatchInfo({value: e.target.value, field: 'roomName'})}
+        id={"Name"}
+        onChange={e => dispatchInfo({value: e.target.value, field: 'Name'})}
       />
       <br />
-      <label htmlFor={"hostName"}>Host Name: </label>
+      </div>
+      <div>
+      <label htmlFor={"giftAmount"}># of Gifts </label>
       <br />
       <input 
         type="text" 
-        id={"hostName"}
-        onChange={e => dispatchInfo({value: e.target.value, field: 'hostName'})}
+        id={"giftAmount"}
+        value={info.giftAmount}
+        onChange={e => dispatchInfo({value: e.target.value, field: 'giftAmount'})}
       />
       <br />
+      </div>
       <button onClick={confirm}>
         Confirm
       </button>
